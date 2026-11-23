@@ -1,0 +1,366 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#fff8f0">
+  <title>유단몬 · 맛있는 상상 한입</title>
+  <style>
+    :root {
+      color-scheme: light;
+      --ink: #493d4a;
+      --muted: #847985;
+      --coral: #ff8f87;
+      --pink: #ffe4e4;
+      --cream: #fff8f0;
+      --lavender: #eee8ff;
+      --mint: #dff4e9;
+      --yellow: #ffedb9;
+      --shadow: 0 18px 55px rgba(116, 83, 103, .12);
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      min-height: 100vh;
+      display: grid;
+      place-items: center;
+      padding: 24px;
+      color: var(--ink);
+      font-family: "Malgun Gothic", "Apple SD Gothic Neo", system-ui, sans-serif;
+      background:
+        radial-gradient(circle at 12% 16%, #ffe5dd 0 7%, transparent 7.2%),
+        radial-gradient(circle at 89% 79%, #e3e8ff 0 9%, transparent 9.2%),
+        linear-gradient(135deg, #fffaf3, #fff4f4 52%, #f7f4ff);
+    }
+    button { font: inherit; }
+    .app {
+      width: min(1120px, 100%);
+      min-height: min(690px, calc(100vh - 48px));
+      position: relative;
+      overflow: hidden;
+      display: grid;
+      grid-template-rows: auto 1fr auto;
+      gap: 22px;
+      padding: 30px 38px 22px;
+      background: rgba(255,255,255,.82);
+      border: 1px solid rgba(255,255,255,.9);
+      border-radius: 32px;
+      box-shadow: var(--shadow);
+      backdrop-filter: blur(10px);
+    }
+    .topbar { display:flex; justify-content:space-between; align-items:center; gap:18px; }
+    .brand { display:flex; align-items:center; gap:12px; }
+    .brand-mark {
+      width:48px; height:48px; display:grid; place-items:center;
+      border-radius:17px; background:var(--pink); font-size:27px;
+      box-shadow: inset 0 -4px rgba(234,143,152,.12);
+    }
+    .brand-name { margin:0; font-size:23px; letter-spacing:-.06em; }
+    .brand-sub { margin:3px 0 0; color:var(--muted); font-size:13px; }
+    .today-pill { padding:10px 16px; border-radius:999px; background:#f8f2ff; color:#78678e; font-size:14px; font-weight:700; }
+    .content { display:grid; grid-template-columns: 1.04fr .96fr; gap:34px; align-items:center; min-height:0; }
+    .left { padding:4px 0 8px 4px; }
+    .eyebrow { display:inline-flex; align-items:center; gap:8px; padding:8px 13px; border-radius:999px; background:var(--mint); color:#547e6e; font-size:14px; font-weight:800; }
+    h1 { margin:18px 0 9px; font-size:clamp(34px,4vw,48px); line-height:1.16; letter-spacing:-.075em; }
+    h1 em { color:#f18480; font-style:normal; }
+    .intro { margin:0 0 23px; color:var(--muted); font-size:16px; line-height:1.65; }
+    .section-label { display:flex; align-items:center; justify-content:space-between; margin:0 0 10px; font-size:15px; font-weight:800; }
+    .section-label small { color:#a197a1; font-size:12px; font-weight:600; }
+    .food-list { display:grid; grid-template-columns:repeat(3,1fr); gap:10px; }
+    .food-choice {
+      min-width:0; padding:9px 7px 10px; border:2px solid transparent; border-radius:18px;
+      color:var(--ink); background:#fff8f4; cursor:pointer; transition:transform .18s ease, border-color .18s ease, background .18s ease;
+    }
+    .food-choice:nth-child(2) { background:#f8f5ff; }
+    .food-choice:nth-child(3) { background:#f1faf4; }
+    .food-choice:hover { transform:translateY(-3px); }
+    .food-choice:focus-visible, .feed-button:focus-visible { outline:3px solid #9d85d7; outline-offset:3px; }
+    .food-choice[aria-pressed="true"] { border-color:#ffaaa2; background:#fff0ed; }
+    .food-choice svg { width:100%; height:75px; display:block; }
+    .food-name { display:block; font-size:14px; font-weight:800; white-space:nowrap; }
+    .food-price { display:block; margin-top:3px; color:var(--muted); font-size:12px; }
+    .price-row { display:flex; align-items:center; justify-content:space-between; margin:15px 1px 13px; padding:12px 14px; border-radius:15px; background:#fff8e8; }
+    .price-title { color:#857763; font-size:14px; font-weight:700; }
+    .price-value { color:#b66a4c; font-size:21px; font-weight:900; letter-spacing:-.04em; }
+    .feed-button {
+      width:100%; min-height:57px; display:flex; justify-content:center; align-items:center; gap:9px;
+      border:0; border-radius:18px; color:white; background:linear-gradient(135deg,#ff9d92,#f47e8b);
+      box-shadow:0 7px 0 #e56f7d, 0 12px 22px rgba(236,119,131,.22);
+      font-size:19px; font-weight:900; letter-spacing:-.04em; cursor:pointer;
+      transition:transform .12s ease, box-shadow .12s ease, filter .15s ease;
+    }
+    .feed-button:hover { filter:saturate(1.08); transform:translateY(-2px); box-shadow:0 9px 0 #e56f7d, 0 15px 24px rgba(236,119,131,.24); }
+    .feed-button:active { transform:translateY(4px) scale(.985); box-shadow:0 3px 0 #e56f7d; }
+    .stage {
+      min-height:405px; position:relative; display:grid; place-items:center; overflow:hidden;
+      border-radius:28px; background:linear-gradient(155deg,#f2edff,#fff0f0 66%,#fff6e7);
+      isolation:isolate;
+    }
+    .stage::before, .stage::after { content:""; position:absolute; z-index:-1; border-radius:50%; }
+    .stage::before { width:310px; height:310px; background:rgba(255,255,255,.5); top:49px; left:50%; transform:translateX(-50%); }
+    .stage::after { width:250px; height:30px; bottom:44px; left:50%; transform:translateX(-50%); background:rgba(128,99,137,.1); filter:blur(8px); }
+    .sparkle { position:absolute; color:#e8b45e; font-size:22px; animation:twinkle 2.4s ease-in-out infinite; }
+    .sparkle.one { top:55px; left:45px; }.sparkle.two { top:102px; right:48px; animation-delay:.8s; }.sparkle.three { bottom:94px; left:68px; animation-delay:1.3s; }
+    @keyframes twinkle { 50% { transform:scale(.7) rotate(24deg); opacity:.45; } }
+    .speech {
+      position:absolute; top:26px; left:50%; transform:translateX(-50%); z-index:2;
+      padding:11px 17px; border:2px solid white; border-radius:18px; background:white;
+      color:#78677b; font-size:15px; font-weight:800; white-space:nowrap; box-shadow:0 5px 18px #b79cb51c;
+    }
+    .speech::after { content:""; position:absolute; left:50%; bottom:-8px; width:13px; height:13px; background:white; transform:translateX(-50%) rotate(45deg); }
+    .speech.excited { color:#df6575; background:#fff3f3; animation:speech-pop .35s cubic-bezier(.2,1.5,.5,1) both; }
+    .speech.excited::after { background:#fff3f3; }
+    @keyframes speech-pop { from { transform:translateX(-50%) scale(.75) rotate(-3deg); } to { transform:translateX(-50%) scale(1) rotate(0); } }
+    .mascot-wrap { width:min(78%,320px); position:relative; margin-top:48px; transform-origin:50% 90%; }
+    .mascot { display:block; width:100%; overflow:visible; filter:drop-shadow(0 14px 10px rgba(117,77,95,.12)); }
+    .mascot-wrap.bounce { animation:bounce .7s cubic-bezier(.25,.7,.3,1.35); }
+    .normal-eyes, .happy-eyes, .sleepy-eyes, .normal-mouth, .happy-mouth, .sleepy-mouth { transition:opacity .16s ease; }
+    .happy-eyes, .happy-mouth, .sleepy-eyes, .sleepy-mouth { display:none; }
+    .mascot-wrap.happy .normal-eyes, .mascot-wrap.happy .normal-mouth,
+    .mascot-wrap.sleepy .normal-eyes, .mascot-wrap.sleepy .normal-mouth,
+    .mascot-wrap.sleepy .happy-eyes, .mascot-wrap.sleepy .happy-mouth { display:none; }
+    .mascot-wrap.happy .happy-eyes, .mascot-wrap.happy .happy-mouth,
+    .mascot-wrap.sleepy .sleepy-eyes, .mascot-wrap.sleepy .sleepy-mouth { display:block; }
+    .mascot-wrap.happy .blush { transform:scale(1.35); transform-box:fill-box; transform-origin:center; }
+    .blush { transition:transform .2s ease; }
+    .mascot-wrap.sleepy { animation:sleepy-sway 1.2s ease-in-out infinite alternate; }
+    @keyframes sleepy-sway { from { transform:rotate(-3deg) translateY(2px); } to { transform:rotate(3deg) translateY(6px); } }
+    .stage.sugar-spike { background:linear-gradient(155deg,#ebe7ff,#fff0e6 66%,#fff6e7); }
+    .speech.spike { max-width:calc(100% - 34px); white-space:normal; line-height:1.35; text-align:center; color:#715d8e; background:#f3edff; }
+    .speech.spike::after { background:#f3edff; }
+    .spike-pop { position:absolute; z-index:3; display:none; top:38%; right:17%; font-size:31px; }
+    .stage.sugar-spike .spike-pop { display:block; animation:doze 1.2s ease-in-out infinite alternate; }
+    @keyframes doze { to { transform:translate(7px,-11px) rotate(10deg); opacity:.55; } }
+    .feed-button:disabled { cursor:default; filter:saturate(.7); opacity:.82; transform:none; box-shadow:0 4px 0 #e56f7d; }
+    .stage.celebrating::before { animation:glow-pop .8s ease-in-out 2 alternate; }
+    @keyframes glow-pop { to { transform:translateX(-50%) scale(1.15); background:rgba(255,255,255,.83); } }
+    .love-pop { position:absolute; z-index:3; opacity:0; pointer-events:none; font-size:30px; }
+    .love-pop.one { left:18%; top:40%; }.love-pop.two { right:17%; top:43%; font-size:25px; }.love-pop.three { right:22%; bottom:22%; font-size:22px; }
+    .stage.celebrating .love-pop { animation:heart-burst 1.4s ease-out both; }
+    .stage.celebrating .love-pop.two { animation-delay:.12s; }.stage.celebrating .love-pop.three { animation-delay:.22s; }
+    @keyframes heart-burst { 0% { opacity:0; transform:translateY(22px) scale(.3) rotate(-20deg); } 22% { opacity:1; transform:translateY(-3px) scale(1.25) rotate(10deg); } 78% { opacity:1; } 100% { opacity:0; transform:translateY(-45px) scale(.9) rotate(24deg); } }
+    @keyframes bounce { 0%,100%{transform:translateY(0) scale(1)} 22%{transform:translateY(-27px) scale(1.035,.96)} 47%{transform:translateY(0) scale(.96,1.04)} 68%{transform:translateY(-11px) scale(1.02,.98)} 84%{transform:translateY(0) scale(1)} }
+    .footer { display:flex; justify-content:space-between; align-items:center; gap:12px; color:#a49aa2; font-size:12px; }
+    .footer span:last-child { color:#c3b6bd; }
+    @media (max-width:760px) {
+      body { padding:10px; }
+      .app { min-height:calc(100vh - 20px); padding:20px 18px 15px; gap:15px; border-radius:25px; }
+      .content { grid-template-columns:1fr; gap:16px; }
+      .left { padding:0; }
+      h1 { margin-top:12px; font-size:34px; }
+      .intro { margin-bottom:15px; font-size:14px; }
+      .stage { min-height:265px; grid-row:1; }
+      .mascot-wrap { width:175px; margin-top:43px; }
+      .stage::before { width:200px; height:200px; top:36px; }
+      .stage::after { bottom:22px; }
+      .speech { top:13px; padding:8px 13px; font-size:13px; }
+      .sparkle.one { top:37px; left:25px; }.sparkle.two { top:60px; right:25px; }.sparkle.three { bottom:45px; left:32px; }
+      .food-choice svg { height:64px; }
+      .footer { font-size:10px; }
+    }
+    @media (max-height:820px) and (min-width:761px) {
+      .app { min-height:calc(100vh - 28px); padding-top:14px; padding-bottom:12px; gap:10px; }
+      .content { gap:24px; }
+      .stage { min-height:345px; }
+      .mascot-wrap { width:min(72%,288px); margin-top:20px; }
+      h1 { margin-top:12px; margin-bottom:6px; }
+      .intro { margin-bottom:15px; }
+      .food-choice svg { height:61px; }
+    }
+    .food-list { grid-template-columns:repeat(5,minmax(0,1fr)); gap:7px; }
+    .food-choice { min-height:62px; padding:4px 3px; border-radius:13px; }
+    .food-emoji { display:block; height:23px; font-size:20px; line-height:23px; }
+    .food-choice .food-name { font-size:11px; line-height:1.2; }
+    .food-choice .food-price { margin-top:0; font-size:9px; line-height:1.1; }
+    .left h1 { font-size:clamp(32px,3.6vw,42px); margin-top:12px; margin-bottom:6px; }
+    .left .intro { margin-bottom:14px; font-size:15px; line-height:1.5; }
+    .price-row { margin:10px 1px; padding:9px 12px; }
+    .feed-button { min-height:52px; }
+    @media (max-width:760px) { .food-list { grid-template-columns:repeat(4,minmax(0,1fr)); gap:6px; } }
+    @media (prefers-reduced-motion: reduce) { *,*::before,*::after { animation-duration:.01ms !important; animation-iteration-count:1 !important; scroll-behavior:auto !important; } }
+  </style>
+</head>
+<body>
+  <main class="app">
+    <header class="topbar">
+      <div class="brand">
+        <div class="brand-mark" aria-hidden="true">🍮</div>
+        <div><p class="brand-name">유단몬</p><p class="brand-sub">맛있는 상상 한입</p></div>
+      </div>
+      <div class="today-pill">오늘도 잘 참았어 ✨</div>
+    </header>
+
+    <section class="content" aria-label="유단몬 음식 미니게임">
+      <div class="left">
+        <div class="eyebrow">🌷 마음으로 먹는 작은 행복</div>
+        <h1>먹고 싶은 마음,<br><em>유단몬에게 맡겨!</em></h1>
+        <p class="intro">먹고 싶은 음식을 골라 주세요.<br>유단몬이 대신 맛있게 먹어 줄게요!</p>
+
+        <div class="section-label"><span>오늘의 맛있는 메뉴</span><small>유단몬 먹은 횟수 <b id="biteCount">0 / 3</b></small></div>
+        <div class="food-list" id="foodList" role="group" aria-label="먹을 음식 선택"></div>
+
+        <div class="price-row" aria-live="polite"><span class="price-title">이 음식의 대략적인 가격</span><span class="price-value" id="price">약 6,500원</span></div>
+        <button class="feed-button" id="feed" type="button"><span aria-hidden="true">💗</span> 유단몬, 대신 먹어 줘!</button>
+      </div>
+
+      <div class="stage" aria-label="유단몬이 음식을 먹는 모습">
+        <span class="sparkle one" aria-hidden="true">✦</span><span class="sparkle two" aria-hidden="true">✧</span><span class="sparkle three" aria-hidden="true">✦</span>
+        <div class="speech" id="speech" aria-live="polite">딸기 케이크라니, 행복해! 🍓</div>
+        <span class="love-pop one" aria-hidden="true">💖</span><span class="love-pop two" aria-hidden="true">✨</span><span class="love-pop three" aria-hidden="true">💕</span><span class="spike-pop" aria-hidden="true">💤</span>
+        <div class="mascot-wrap" id="mascotWrap">
+          <svg class="mascot" viewBox="0 0 360 400" role="img" aria-label="긴 남색 머리와 빨간 리본을 한 귀여운 유단몬">
+            <!-- Inline original redraw based on the user's character references. -->
+            <ellipse cx="180" cy="379" rx="94" ry="12" fill="#d8b9c5" opacity=".36"/>
+            <path d="M92 157C77 91 124 44 181 47c67-7 112 39 105 116 39 53 40 139 8 187l-39 22-18-61-115 3-16 50c-41-22-56-69-53-117 2-37 7-68 39-90Z" fill="#176087" stroke="#18384a" stroke-width="6" stroke-linejoin="round"/>
+            <path d="M99 168c-9 86-4 159 18 207m173-194c19 80 15 145-12 184" fill="none" stroke="#3d84a5" stroke-width="12" stroke-linecap="round" opacity=".72"/>
+            <path d="M119 266c-27 6-44 28-44 60 0 23 12 37 32 40l29-32 88 0 29 32c22-3 34-18 34-41 0-34-20-55-47-60Z" fill="#fffdfb" stroke="#26313a" stroke-width="6" stroke-linejoin="round"/>
+            <path d="M120 273c-15 8-19 22-14 36l17 24 20-20m97-40c16 8 20 22 14 36l-17 24-20-20" fill="#f7f6f6" stroke="#26313a" stroke-width="5" stroke-linejoin="round"/>
+            <path d="M126 279q-19 8-22 24l15 6 18-19m97-11q19 8 22 24l-15 6-18-19" fill="#ffcfb7" stroke="#26313a" stroke-width="5" stroke-linejoin="round"/>
+            <path d="M146 342h68l9 24q-43 12-86 0Z" fill="#ffcfb7" stroke="#26313a" stroke-width="5"/>
+            <path d="M139 363q41 10 82 0l3 21q-45 12-89 0Z" fill="#66865c" stroke="#26313a" stroke-width="5"/>
+            <path d="M155 368v8m17-6v8m18-8v8m17-10v8" stroke="#435b42" stroke-width="3" stroke-linecap="round"/>
+            <rect x="145" y="300" width="38" height="28" rx="5" fill="#fff" stroke="#38404a" stroke-width="3"/>
+            <text x="164" y="318" text-anchor="middle" font-size="10" font-weight="800" fill="#30323b">돼지</text>
+            <path d="m153 302 22 24m0-24-22 24" stroke="#d83132" stroke-width="3.5" stroke-linecap="round"/>
+            <path d="M105 146c1-47 34-78 76-78s74 30 75 78l-9 83c-5 43-29 66-66 66s-62-23-67-66Z" fill="#ffd4c1" stroke="#24313a" stroke-width="6"/>
+            <path d="M115 189q-16 16-13 35 2 13 12 13m132-48q16 16 13 35-2 13-12 13" fill="#ffcbb8" stroke="#24313a" stroke-width="5" stroke-linecap="round"/>
+            <g class="normal-eyes">
+              <ellipse cx="145" cy="202" rx="22" ry="27" fill="#fff" stroke="#1e2932" stroke-width="4"/><ellipse cx="215" cy="202" rx="22" ry="27" fill="#fff" stroke="#1e2932" stroke-width="4"/>
+              <ellipse cx="148" cy="206" rx="12" ry="17" fill="#352c38"/><ellipse cx="212" cy="206" rx="12" ry="17" fill="#352c38"/>
+              <circle cx="152" cy="198" r="5" fill="#fff"/><circle cx="216" cy="198" r="5" fill="#fff"/>
+              <path d="M126 184q17-18 35-5m38 0q18-13 35 5" fill="none" stroke="#24313a" stroke-width="5" stroke-linecap="round"/>
+            </g>
+            <g class="happy-eyes"><path d="M125 205q19-23 39 0m32 0q19-23 39 0" fill="none" stroke="#242832" stroke-width="7" stroke-linecap="round"/><path d="m139 187 5-7 5 7m55 0 5-7 5 7" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round"/></g>
+            <g class="sleepy-eyes" fill="none" stroke="#30313a" stroke-width="7" stroke-linecap="round"><path d="M126 204q20 10 38 0m32 0q20 10 38 0"/><path d="M130 195l-5 7m42-7 5 7m22-7 5 7m35-7 5 7" stroke-width="4"/></g>
+            <path class="normal-mouth" d="M169 235q11 12 22 0" fill="none" stroke="#a34453" stroke-width="4" stroke-linecap="round"/>
+            <g class="happy-mouth"><path d="M159 229q21-17 42 0l-4 25q-17 18-34 0Z" fill="#783948" stroke="#402834" stroke-width="3"/><path d="M162 246q18-10 36 0-4 18-18 18t-18-18" fill="#f27f91"/><path d="m166 230 7 9 7-10" fill="#fff"/></g>
+            <path class="sleepy-mouth" d="M168 236q12-5 24 0" fill="none" stroke="#9c626b" stroke-width="4" stroke-linecap="round"/>
+            <ellipse class="blush" cx="119" cy="226" rx="15" ry="8" fill="#f28d98" opacity=".8"/><ellipse class="blush" cx="241" cy="226" rx="15" ry="8" fill="#f28d98" opacity=".8"/>
+            <path d="M100 175C78 106 124 45 184 50c65 4 101 49 81 121-12-14-24-27-38-38-6 25-25 39-48 45-3-17-10-30-19-41-13 26-31 38-57 43Z" fill="#185778" stroke="#16374a" stroke-width="6" stroke-linejoin="round"/>
+            <path d="M101 166c-5 72 1 147 22 209m151-205c17 73 12 131-9 178" fill="none" stroke="#347c9c" stroke-width="10" stroke-linecap="round" opacity=".75"/>
+            <path d="M133 103q14-20 27-12m63 3q16 1 21 17" fill="none" stroke="#4890ad" stroke-width="6" stroke-linecap="round" opacity=".7"/>
+            <path d="M169 63C132 18 96 30 108 70c8 25 38 31 67 15-3 15-1 27 5 34 6-7 8-19 5-34 29 16 59 10 67-15 12-40-24-52-61-7-2-13-7-21-12-25-5 4-10 12-10 25Z" fill="#c9252e" stroke="#22242a" stroke-width="6" stroke-linejoin="round"/>
+            <circle cx="180" cy="81" r="10" fill="#a91d2b" stroke="#29232a" stroke-width="4"/>
+          </svg>
+        </div>
+      </div>
+    </section>
+
+    <footer class="footer"><span>유단몬과 함께하는 기분 좋은 한입 🌼</span><span>혈당 스파이크는 게임 속 연출이에요</span></footer>
+  </main>
+  <script>
+    const menu = [
+      { id: "cake", name: "딸기 케이크", emoji: "🍰", price: 6500 },
+      { id: "pizza", name: "치즈 피자", emoji: "🍕", price: 12000 },
+      { id: "burger", name: "햄버거", emoji: "🍔", price: 7500 },
+      { id: "ramen", name: "라면", emoji: "🍜", price: 4500 },
+      { id: "chicken", name: "치킨", emoji: "🍗", price: 19000 },
+      { id: "tteokbokki", name: "떡볶이", emoji: "🍢", price: 6000 },
+      { id: "sushi", name: "초밥", emoji: "🍣", price: 15000 },
+      { id: "donut", name: "도넛", emoji: "🍩", price: 2800 },
+      { id: "hotdog", name: "핫도그", emoji: "🌭", price: 4500 },
+      { id: "waffle", name: "와플", emoji: "🧇", price: 5500 },
+      { id: "icecream", name: "아이스크림", emoji: "🍦", price: 3500 },
+      { id: "pancake", name: "팬케이크", emoji: "🥞", price: 6500 },
+      { id: "pasta", name: "파스타", emoji: "🍝", price: 11000 },
+      { id: "sandwich", name: "샌드위치", emoji: "🥪", price: 6000 },
+      { id: "dumpling", name: "만두", emoji: "🥟", price: 7000 },
+      { id: "bibimbap", name: "비빔밥", emoji: "🍲", price: 10000 },
+      { id: "croissant", name: "크루아상", emoji: "🥐", price: 3200 },
+      { id: "macaron", name: "마카롱", emoji: "🍬", price: 2200 },
+      { id: "taco", name: "타코", emoji: "🌮", price: 8000 },
+      { id: "bingsu", name: "빙수", emoji: "🍧", price: 12000 }
+    ];
+    const foodList = document.getElementById("foodList");
+    foodList.innerHTML = menu.map((food, index) => `
+      <button class="food-choice" type="button" data-food="${food.id}" aria-pressed="${index === 0}" aria-label="${food.name}, 약 ${food.price.toLocaleString("ko-KR")}원">
+        <span class="food-emoji" aria-hidden="true">${food.emoji}</span>
+        <span class="food-name">${food.name}</span>
+        <span class="food-price">약 ${food.price.toLocaleString("ko-KR")}원</span>
+      </button>
+    `).join("");
+    const choices = [...document.querySelectorAll(".food-choice")];
+    const price = document.getElementById("price");
+    const speech = document.getElementById("speech");
+    const mascot = document.getElementById("mascotWrap");
+    const stage = document.querySelector(".stage");
+    const biteCountLabel = document.getElementById("biteCount");
+    const feedButton = document.getElementById("feed");
+    let selected = menu[0].id;
+    let resetSpeech;
+    let spikeTimer;
+    let bites = 0;
+    let recovering = false;
+    const getFood = () => menu.find((food) => food.id === selected);
+    const won = (amount) => `약 ${amount.toLocaleString("ko-KR")}원`;
+
+    choices.forEach((button) => button.addEventListener("click", () => {
+      selected = button.dataset.food;
+      choices.forEach((choice) => choice.setAttribute("aria-pressed", String(choice === button)));
+      const food = getFood();
+      price.textContent = won(food.price);
+      if (!recovering) {
+        speech.textContent = `${food.name}라니, 벌써 행복해! ${food.emoji}`;
+        speech.classList.remove("excited", "spike");
+        mascot.classList.remove("happy", "sleepy");
+        stage.classList.remove("celebrating", "sugar-spike");
+        clearTimeout(resetSpeech);
+      }
+    }));
+
+    feedButton.addEventListener("click", () => {
+      if (recovering) return;
+      bites += 1;
+      biteCountLabel.textContent = `${bites} / 3`;
+      mascot.classList.remove("bounce");
+      void mascot.offsetWidth;
+      mascot.classList.add("bounce", "happy");
+      stage.classList.remove("celebrating");
+      void stage.offsetWidth;
+      stage.classList.add("celebrating");
+      const food = getFood();
+      speech.textContent = `우와아아! ${food.name} 너무 맛있어! 세상에서 제일 행복해! ${food.emoji}💖`;
+      speech.classList.remove("excited", "spike");
+      void speech.offsetWidth;
+      speech.classList.add("excited");
+      clearTimeout(resetSpeech);
+
+      if (bites >= 3) {
+        clearTimeout(resetSpeech);
+        mascot.classList.remove("bounce", "happy");
+        mascot.classList.add("sleepy");
+        stage.classList.remove("celebrating");
+        stage.classList.add("sugar-spike");
+        speech.classList.remove("excited");
+        speech.classList.add("spike");
+        speech.textContent = "앗… 너무 많이 먹었더니 졸음이 쏟아져! 혈당 스파이크 모드… 💤";
+        feedButton.disabled = true;
+        feedButton.innerHTML = '<span aria-hidden="true">💤</span> 유단몬 쉬는 중…';
+        recovering = true;
+        spikeTimer = setTimeout(() => {
+          recovering = false;
+          bites = 0;
+          biteCountLabel.textContent = "0 / 3";
+          mascot.classList.remove("sleepy");
+          stage.classList.remove("sugar-spike");
+          speech.classList.remove("spike");
+          speech.textContent = `${getFood().name}라니, 벌써 행복해! ${getFood().emoji}`;
+          feedButton.disabled = false;
+          feedButton.innerHTML = '<span aria-hidden="true">💗</span> 유단몬, 대신 먹어 줘!';
+        }, 4500);
+        return;
+      }
+
+      resetSpeech = setTimeout(() => {
+        const currentFood = getFood();
+        speech.textContent = `${currentFood.name}라니, 벌써 행복해! ${currentFood.emoji}`;
+        speech.classList.remove("excited");
+        mascot.classList.remove("happy");
+        stage.classList.remove("celebrating");
+      }, 2600);
+    });
+
+    mascot.addEventListener("animationend", () => mascot.classList.remove("bounce"));
+  </script>
+</body>
+</html>
